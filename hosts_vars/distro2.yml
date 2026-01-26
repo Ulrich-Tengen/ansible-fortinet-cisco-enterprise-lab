@@ -1,1 +1,9 @@
-
+---
+ansible_user: distro2
+# Network specifics for Distro 2
+uplink_ip: "172.16.2.2"
+uplink_int: "GigabitEthernet2/1"
+vlans:
+  - { id: 10, name: "LAN", ip: "192.168.1.2", vip: "192.168.1.254", interfaces: ["Gi0/0", "Gi0/1"] }
+  - { id: 20, name: "WLAN", ip: "192.168.2.2", vip: "192.168.2.254", interfaces: ["Gi0/2", "Gi0/3"] }
+  - { id: 30, name: "Voip", ip: "192.168.3.2", vip: "192.168.3.254", interfaces: ["Gi1/0", "Gi1/1"] }
