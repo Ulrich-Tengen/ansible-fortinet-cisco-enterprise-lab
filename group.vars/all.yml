@@ -1,1 +1,24 @@
+# Core Router Settings
+core_configs:
+  core1:
+    inside_ip: "10.10.10.13"
+    outside_int: "GigabitEthernet0/2"
+    inside_int: "GigabitEthernet0/0"
+  core2:
+    inside_ip: "10.10.10.5"
+    outside_int: "GigabitEthernet0/2"
+    inside_int: "GigabitEthernet0/0"
 
+# Shared backbone links
+etherchannel_members: ["GigabitEthernet2/0", "GigabitEthernet1/2", "GigabitEthernet1/3"]
+
+ansible_user: admin
+ansible_connection: network_cli
+ansible_network_os: cisco.ios.ios
+ansible_password: "{{ vault_ansible_password }}"
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_password: "{{ vault_ansible_password }}"
+# Fix for timeouts and SSH channel drops
+ansible_command_timeout: 180
+ansible_connect_timeout: 100
