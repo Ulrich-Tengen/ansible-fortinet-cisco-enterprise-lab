@@ -1,3 +1,15 @@
+📝 Project Summary: The "Infrastructure as Code" Journey
+This project simulates a real-world enterprise network migration from manual configuration to Ansible-driven automation. The core challenge was not just pushing configurations, but ensuring the multi-vendor environment (Cisco & Fortinet) maintained a seamless control plane via OSPF.
+
+Key Technical Achievements
+High-Availability Firewalling: Configured a FortiGate HA Cluster with automated policy generation and NAT.
+
+Dynamic Route Propagation: Solved the "Internet Black Hole" issue by automating OSPF default-route injection (default-information-originate) from the perimeter to the access layer.
+
+Hierarchical Scalability: Used Ansible loops to manage a 6-switch access layer, standardizing VLANs, SVIs, and default gateways across the fabric.
+
+Security-First Automation: Sanitized all playbooks by migrating hardcoded credentials into an encrypted/variable-based structure to prevent sensitive data leakage.
+
 # ansible-fortinet-cisco-enterprise-lab
 Automated Multi-Tier Network Deployment (Ansible & FortiOS)
 This project automates the deployment of a robust, three-tier enterprise network architecture. It features a high-availability FortiGate firewall cluster, Cisco IOS Distribution switches, and a scaled Access layer.
@@ -50,4 +62,4 @@ Bash
 ansible-playbook -i inventory/hosts.yml playbooks/deploy_network.yml --limit core_routers,distro_switches
 
 # To deploy the full Firewall
-ansible-playbook -i inventory/hosts.yml deploy_forti.yml
+ansible-playbook -i inventory/hosts.yml deploy_forti.ymL
