@@ -2,6 +2,7 @@
 This project simulates a real-world enterprise network migration from manual configuration to Ansible-driven automation. The core challenge was not just pushing configurations, but ensuring the multi-vendor environment (Cisco & Fortinet) maintained a seamless control plane via OSPF.
 
 Key Technical Achievements
+
 High-Availability Firewalling: Configured a FortiGate HA Cluster with automated policy generation and NAT.
 
 Dynamic Route Propagation: Solved the "Internet Black Hole" issue by automating OSPF default-route injection (default-information-originate) from the perimeter to the access layer.
