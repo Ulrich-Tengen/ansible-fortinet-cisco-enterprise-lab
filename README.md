@@ -10,6 +10,8 @@ Dynamic Route Propagation: Solved the "Internet Black Hole" issue by automating 
 Hierarchical Scalability: Used Ansible loops to manage a 6-switch access layer, standardizing VLANs, SVIs, and default gateways across the fabric.
 
 Security-First Automation: Sanitized all playbooks by migrating hardcoded credentials into an encrypted/variable-based structure to prevent sensitive data leakage.
+#### 1. Network Architecture
+![Network Topology](images/Capture9.JPG)
 
 # ansible-fortinet-cisco-enterprise-lab
 Automated Multi-Tier Network Deployment (Ansible & FortiOS)
@@ -61,6 +63,23 @@ hosts.yml: Inventory file defining device groups.
 Bash
 # To deploy core routers and distro switches
 ansible-playbook -i inventory/hosts.yml playbooks/deploy_network.yml --limit core_routers,distro_switches
+[distro switch Success](images/capture 1.JPG)
+[core router Success](images/Capture 2.JPG)
+
+# To update just the HSRP config
+ansible-playbook -i inventory/hosts.yml playbooks/deploy_network.yml --tags hsrp_update
+[hsrp update Success](images/Capture 3.JPG)
+
 
 # To deploy the full Firewall
 ansible-playbook -i inventory/hosts.yml deploy_forti.ymL
+[Fortigate config Success](images/Capture 4.JPG)
+[API connectivity Success](images/Capture5.JPG)
+
+# To deploy all the Access Switches
+ansible-playbook -i inventory/hosts.yml playbooks/deploy_access.ymL
+[Access switches Success](images/Capture7.JPG)
+
+# End-to-End Connectivity
+*Successful ICMP reachability to 8.8.8.8 from the internal VLANs.*
+![Internet Ping Success](images/Capture8.JPG)
