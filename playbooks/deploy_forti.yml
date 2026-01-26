@@ -1,1 +1,96 @@
+- name: Full FortiGate Automation - HA, OSPF, and NAT
+  hosts: fortigates
+  gather_facts: no
+  connection: httpapi
+  collections:
+    - fortinet.fortios
 
+  tasks:
+    # 1. HA CONFIGURATION (Do this first so they sync)
+    - name: Test API Connectivity
+      fortinet.fortios.fortios_configuration_fact:
+        selector: "system_status"
+      register: test_out
+
+    - name: Show Status
+      debug:
+        var: test_out
+
+    - name: Configure Active-Active HA
+      fortinet.fortios.fortios_system_ha:
+        vdom: "root"
+        system_ha:
+          group_name: "Lab_Cluster"
+          mode: "a-a"
+          password: "admin"
+          session_pickup: enable
+          override: disable
+          priority: "{{ 200 if inventory_hostname == 'Forti_HA1' else 100 }}"
+          hbdev:
+            - "port2"
+            - "port3"
+          monitor:
+            - "port1"
+
+    - name: Configure OSPF
+      fortinet.fortios.fortios_router_ospf:
+        vdom: root
+        router_ospf:
+          router_id: "{{ '1.1.1.2' if inventory_hostname == 'Forti_HA1' else '1.1.1.3' }}"
+          area:
+              - id: 0.0.0.0
+          network:
+              - id: 1
+                prefix: 192.168.1.0 255.255.255.0
+                area: 0.0.0.0
+              - id: 2
+                prefix: 172.16.0.0 255.255.0.0
+                area: 0.0.0.0
+              - id: 3
+                prefix: 10.10.10.12 255.255.255.252
+                area: 0.0.0.0
+              - id: 4
+                prefix: 192.168.2.0 255.255.255.0 # VLAN 20
+                area: 0.0.0.0
+              - id: 5
+                prefix: 192.168.3.0 255.255.255.0 # VLAN 30
+                area: 0.0.0.0   
+
+    - name: Create Address Objects and Group
+      fortinet.fortios.fortios_firewall_address:
+        vdom: root
+        state: present
+        firewall_address:
+          name: "{{ item.name }}"
+          subnet: "{{ item.subnet }}"
+      loop:
+        - { name: "LAN_vlan", subnet: "192.168.1.0 255.255.255.0" }
+        - { name: "WLAN_vlan", subnet: "192.168.2.0 255.255.255.0" }
+        - { name: "Voip_vlan", subnet: "192.168.3.0 255.255.255.0" }
+          
+    - name: Create Address Group
+      fortinet.fortios.fortios_firewall_addrgrp:
+        vdom: root
+        state: present
+        firewall_addrgrp:
+          name: "Authorized_Internal_Networks"
+          member:
+            - { name: "LAN_vlan" }
+            - { name: "WLAN_vlan" }
+            - { name: "Voip_vlan" } 
+
+    - name: Enable NAT on Internet Access Policy
+      fortinet.fortios.fortios_firewall_policy:
+        vdom: root
+        state: present
+        firewall_policy:
+          policyid: 1
+          name: Internet_Access
+          srcintf: [{ name: "port1" }]
+          dstintf: [{ name: "port4" }]
+          srcaddr: [{ name: "Authorized_Internal_Networks" }]
+          dstaddr: [{ name: "all" }]
+          action: "accept"
+          schedule: "always"
+          service: [{ name: "ALL" }]
+          nat: "enable"
