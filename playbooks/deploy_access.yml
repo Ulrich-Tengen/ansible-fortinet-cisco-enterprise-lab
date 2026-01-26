@@ -1,1 +1,53 @@
+---
+- name: Configure Remaining Edge Ports
+  hosts: access_switches
+  gather_facts: no
+  connection: network_cli
+  throttle: 1
 
+  tasks:
+    - name: Global STP Setup
+      cisco.ios.ios_config:
+        lines:
+          - spanning-tree mode rapid-pvst
+
+    - name: Configure Edge Ports - Slot 0
+      cisco.ios.ios_config:
+        # Added spaces around the hyphen as required by your IOS version
+        parents: interface range Ethernet0/2 - 3
+        lines:
+          - description Managed_Edge_Port
+          - switchport mode access
+          - switchport access vlan {{ 10 if 'ACCESS1' in inventory_hostname or 'ACCESS2' in inventory_hostname else (20 if 'ACCESS3' in inventory_hostname or 'ACCESS4' in inventory_hostname else 30) }}
+          - spanning-tree portfast
+          - spanning-tree bpduguard enable
+          - switchport port-security
+          - switchport port-security maximum 1
+          - switchport port-security violation shutdown
+          - switchport port-security mac-address sticky
+
+    - name: Configure Edge Ports - Slot 1
+      cisco.ios.ios_config:
+        # Added spaces here as well
+        parents: interface range Ethernet1/0 - 3
+        lines:
+          - description Managed_Edge_Port
+          - switchport mode access
+          - switchport access vlan {{ 10 if 'ACCESS1' in inventory_hostname or 'ACCESS2' in inventory_hostname else (20 if 'ACCESS3' in inventory_hostname or 'ACCESS4' in inventory_hostname else 30) }}
+          - spanning-tree portfast
+          - spanning-tree bpduguard enable
+          - switchport port-security
+          - switchport port-security maximum 1
+          - switchport port-security violation shutdown
+          - switchport port-security mac-address sticky
+
+    - name: Configure IP Default Gateway
+      cisco.ios.ios_config:
+        lines:
+          # Logic: Access 1/2 use .1.1, Access 3/4 use .2.1, Access 5/6 use .3.1
+          - ip default-gateway {{ '192.168.1.1' if 'ACCESS1' in inventory_hostname or 'ACCESS2' in inventory_hostname else ('192.168.2.1' if 'ACCESS3' in inventory_hostname or 'ACCESS4' in inventory_hostname else '192.168.3.1') }}
+      tags: gateway      
+
+    - name: Save Config
+      cisco.ios.ios_command:
+        commands: write memory
