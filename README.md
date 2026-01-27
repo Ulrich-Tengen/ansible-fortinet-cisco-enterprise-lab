@@ -64,25 +64,25 @@ Bash
 # To deploy core routers and distro switches
 ansible-playbook -i inventory/hosts.yml playbooks/deploy_network.yml --limit core_routers,distro_switches
 
-[distro switch Success](images/capture 1.JPG)
-[core router Success](images/Capture 2.JPG)
+![distro switch Success](images/capture 1.JPG)
+![core router Success](images/Capture 2.JPG)
 
 # To update just the HSRP config
 ansible-playbook -i inventory/hosts.yml playbooks/deploy_network.yml --tags hsrp_update
 
-[hsrp update Success](images/Capture 3.JPG)
+![hsrp update Success](images/Capture 3.JPG)
 
 
 # To deploy the full Firewall
 ansible-playbook -i inventory/hosts.yml deploy_forti.ymL
 
-[Fortigate config Success](images/Capture 4.JPG)
-[API connectivity Success](images/Capture5.JPG)
+![Fortigate config Success](images/Capture 4.JPG)
+![API connectivity Success](images/Capture5.JPG)
 
 # To deploy all the Access Switches
 ansible-playbook -i inventory/hosts.yml playbooks/deploy_access.ymL
 
-[Access switches Success](images/Capture7.JPG)
+![Access switches Success](images/Capture7.JPG)
 
 # End-to-End Connectivity
 *Successful ICMP reachability to 8.8.8.8 from the internal VLANs.*
